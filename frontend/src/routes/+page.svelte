@@ -63,6 +63,7 @@
     center={[18.83271, -33.964493]}
     zoom={10}
     bind:map={mapInstance}
+    options={{ pitch: 50, bearing: 20 }}
     styles={{
       light: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",
       dark: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json",

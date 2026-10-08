@@ -1,0 +1,24 @@
+# air configuration for the Go backend
+# Docs: https://github.com/air-verse/air
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd        = "go build -o ./tmp/server ."
+  bin        = "./tmp/server"
+  delay      = 200          # ms to wait before rebuilding after a change
+  include_ext = ["go"]
+  exclude_dir = ["tmp"]
+  kill_delay  = "0s"
+  send_interrupt = true     # send SIGINT before SIGKILL
+
+[log]
+  time = false              # keep output clean — no timestamps
+
+[color]
+  build  = "yellow"
+  runner = "green"
+
+[misc]
+  clean_on_exit = true      # remove tmp/ when air exits

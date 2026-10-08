@@ -76,13 +76,13 @@
         <MarkerContent>
           {#if branch.type === "head"}
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg ring-2 ring-white dark:ring-zinc-900"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg ring-2 ring-white dark:ring-zinc-900 hover:animate-bounce"
             >
               <Landmark class="h-3.5 w-3.5" />
             </div>
           {:else}
             <div
-              class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-white shadow-lg"
+              class="flex h-9 w-9 items-center justify-center rounded-full bg-white text-white shadow-lg hover:animate-bounce"
             >
               <Avatar.Root>
                 <Avatar.Image src={capitecLogo} alt="Capitec Bank" />

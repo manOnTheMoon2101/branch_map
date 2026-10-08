@@ -75,7 +75,7 @@
         <MarkerContent>
           {#if branch.type === "head"}
             <div
-              class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white shadow-lg ring-2 ring-white dark:ring-zinc-900"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg ring-2 ring-white dark:ring-zinc-900"
             >
               <Landmark class="h-3.5 w-3.5" />
             </div>
@@ -91,55 +91,93 @@
           {/if}
         </MarkerContent>
 
-        <MarkerPopup closeButton>
-          <div class="w-56 space-y-3">
-            <div>
-              <h3 class="pr-4 text-sm font-semibold leading-snug">
-                {branch.name}
-              </h3>
-              {#if branch.type == "head"}
-                <span>Head Office</span>
-              {/if}
+        <MarkerPopup class="overflow-hidden p-0 max-w-none">
+          <div
+            class={[
+              "px-4 py-3",
+              branch.type === "head" ? "bg-red-500" : "bg-sky-600",
+            ].join(" ")}
+          >
+            <div class="flex items-center gap-3">
+              <div
+                class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full {branch.type ===
+                'head'
+                  ? 'bg-red-500'
+                  : 'bg-white'}"
+              >
+                {#if branch.type === "head"}
+                  <Landmark class="h-4 w-4 text-white" />
+                {:else}
+                  <Avatar.Root class="h-8 w-8">
+                    <Avatar.Image src={capitecLogo} alt="Capitec" />
+                    <Avatar.Fallback class="bg-white text-xs text-white"
+                      >CB</Avatar.Fallback
+                    >
+                  </Avatar.Root>
+                {/if}
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <p
+                  class="text-[10px] font-medium tracking-widest text-white/70"
+                >
+                  {branch.type === "head"
+                    ? "Head Office"
+                    : branch.type === "atm"
+                      ? "ATM"
+                      : "Branch"}
+                </p>
+                <h3
+                  class="truncate text-sm font-semibold leading-tight text-white"
+                >
+                  {branch.name}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <div class="w-60 space-y-2.5 px-4 py-3">
+            <div class="flex items-start gap-2.5">
+              <span
+                class={[
+                  "flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                  branch.type === "head" ? " text-red-600" : " text-sky-600",
+                ].join(" ")}
+              >
+                <MapPin class="h-3 w-3" />
+              </span>
+              <span class="text-xs leading-5 text-muted-foreground"
+                >{branch.city}, {branch.province}</span
+              >
             </div>
 
-            <div class="space-y-2 text-xs text-muted-foreground">
-              <div class="flex items-start gap-2">
-                <MapPin
+            {#if branch.phone}
+              <div class="flex items-center gap-2.5">
+                <span
                   class={[
-                    "mt-0.5 h-3.5 w-3.5 shrink-0",
-                    branch.type === "head"
-                      ? "text-amber-500"
-                      : "text-sky-600 dark:text-sky-400",
+                    "flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                    branch.type === "head" ? " text-red-600" : " text-sky-600",
                   ].join(" ")}
-                />
-                <span>{branch.city}, {branch.province}</span>
+                >
+                  <Phone class="h-3 w-3" />
+                </span>
+                <span class="text-xs text-muted-foreground">{branch.phone}</span
+                >
               </div>
+            {/if}
 
-              {#if branch.phone}
-                <div class="flex items-center gap-2">
-                  <Phone
-                    class={[
-                      "h-3.5 w-3.5 shrink-0",
-                      branch.type === "head"
-                        ? "text-amber-500"
-                        : "text-sky-600 dark:text-sky-400",
-                    ].join(" ")}
-                  />
-                  <span>{branch.phone}</span>
-                </div>
-              {/if}
-
-              <div class="flex items-start gap-2">
-                <Clock
-                  class={[
-                    "mt-0.5 h-3.5 w-3.5 shrink-0",
-                    branch.type === "head"
-                      ? "text-amber-500"
-                      : "text-sky-600 dark:text-sky-400",
-                  ].join(" ")}
-                />
-                <span>{branch.hours}</span>
-              </div>
+            <div class="flex items-start gap-2.5">
+              <span
+                class={[
+                  "flex h-5 w-5 shrink-0 items-center justify-center rounded",
+                  branch.type === "head" ? " text-red-600" : " text-sky-600",
+                ].join(" ")}
+              >
+                <Clock class="h-3 w-3" />
+              </span>
+              <span class="text-xs leading-5 text-muted-foreground"
+                >{branch.hours}</span
+              >
             </div>
           </div>
         </MarkerPopup>

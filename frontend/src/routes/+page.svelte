@@ -13,7 +13,11 @@
   import * as Avatar from "#lib/components/ui/avatar/index.js";
   import capitecLogo from "../assets/capitec.png";
   import CircleAlert from "@lucide/svelte/icons/circle-alert";
+  import ChevronDown from "@lucide/svelte/icons/chevron-down";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import Building2 from "@lucide/svelte/icons/building-2";
   import type { Map as MaplibreMap } from "maplibre-gl";
+  import { Button } from "#lib/components/ui/button/index.js";
 
   type Branch = {
     id: number;
@@ -30,6 +34,27 @@
   let branches = $state<Branch[]>([]);
   let fetchError = $state<string | null>(null);
   let mapInstance = $state<MaplibreMap | null>(null);
+
+  const INITIAL_COUNT = 5;
+  let cardOpen = $state<boolean>(true);
+  let showAll = $state<boolean>(false);
+  const visibleBranches = $derived.by(() => {
+    const sorted = [...branches].sort((a, b) =>
+      a.type === "head" ? -1 : b.type === "head" ? 1 : 0,
+    );
+    return showAll ? sorted : sorted.slice(0, INITIAL_COUNT);
+  });
+
+  function flyToBranch(branch: Branch) {
+    mapInstance?.flyTo({
+      center: [branch.longitude, branch.latitude],
+      zoom: 14,
+      pitch: 50,
+      bearing: 20,
+      duration: 1500,
+      essential: true,
+    });
+  }
 
   $effect(() => {
     if (!mapInstance) return;
@@ -194,4 +219,92 @@
       <span>Could not load branches — {fetchError}</span>
     </div>
   {/if}
+
+  <div class="absolute top-4 left-4 z-10 w-72">
+    <div
+      class="overflow-hidden rounded-xl border bg-background/95 shadow-xl backdrop-blur-sm"
+    >
+      <Button
+        type="button"
+        onclick={() => (cardOpen = !cardOpen)}
+        class="flex w-full items-center justify-between px-4 py-3 transition-colors hover:bg-muted/50"
+      >
+        <div class="flex items-center gap-2">
+          <div class="flex h-6 w-6 items-center justify-center rounded-md">
+            <Building2 class="h-3.5 w-3.5 text-sky-600" />
+          </div>
+          <span class="text-sm font-semibold">Branches</span>
+        </div>
+        <ChevronDown
+          class="h-4 w-4 text-muted-foreground transition-transform duration-200 {cardOpen
+            ? 'rotate-180'
+            : ''}"
+        />
+      </Button>
+
+      {#if cardOpen}
+        <div class="border-t">
+          <ul class="divide-y divide-border">
+            {#each visibleBranches as branch (branch.id)}
+              <li>
+                <Button
+                  type="button"
+                  onclick={() => flyToBranch(branch)}
+                  class="flex w-full items-center gap-3 px-8 py-8 text-left transition-colors hover:bg-muted/50 cursor-pointer"
+                >
+                  <div
+                    class={[
+                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full",
+                      branch.type === "head"
+                        ? "text-white bg-red-600"
+                        : branch.type === "atm"
+                          ? "text-amber-600 "
+                          : "text-sky-600",
+                    ].join(" ")}
+                  >
+                    {#if branch.type === "head"}
+                      <Landmark class="h-3.5 w-3.5" />
+                    {:else}
+                      <Avatar.Root class="h-4 w-4">
+                        <Avatar.Image src={capitecLogo} alt="Capitec" />
+                        <Avatar.Fallback class="bg-white text-xs text-white"
+                          >CB</Avatar.Fallback
+                        >
+                      </Avatar.Root>
+                    {/if}
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-xs font-medium">{branch.name}</p>
+                    <p class="truncate text-xs text-muted-foreground">
+                      {branch.city}, {branch.province}
+                    </p>
+                  </div>
+                </Button>
+              </li>
+            {/each}
+          </ul>
+
+          {#if branches.length > INITIAL_COUNT}
+            <div class="border-t px-4 py-2.5">
+              <button
+                type="button"
+                onclick={() => (showAll = !showAll)}
+                class="flex w-full items-center justify-center gap-1.5 py-1 text-xs font-medium text-sky-600 transition-colors hover:text-sky-700"
+              >
+                {showAll
+                  ? "Show less"
+                  : `Show ${branches.length - INITIAL_COUNT} more`}
+                <ChevronDown
+                  class="h-3.5 w-3.5 transition-transform duration-200 {showAll
+                    ? 'rotate-180'
+                    : ''}"
+                />
+              </button>
+            </div>
+          {/if}
+        </div>
+      {/if}
+    </div>
+  </div>
 </div>

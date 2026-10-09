@@ -1,6 +1,6 @@
 # Capitec Branch Map
 
-An interactive full-screen map that displays Capitec Bank branch and ATM locations across South Africa. Click any marker to view branch details and get directions.
+An interactive full-screen map that displays Capitec Bank branch locations across South Africa. Click any marker to view branch details and get directions.
 
 ---
 
@@ -40,7 +40,6 @@ An interactive full-screen map that displays Capitec Bank branch and ATM locatio
 |---|---|---|
 | Branch marker / header | `sky-600` | `#0284c7` |
 | Head Office marker / header | `red-500` | `#ef4444` |
-| ATM marker / header | `amber-500` | `#f59e0b` |
 
 ### Font
 
@@ -153,7 +152,7 @@ docker compose up --build --force-recreate
 
 ### `GET /api/branches`
 
-Returns all branch and ATM locations.
+Returns all branch locations.
 
 **Response**
 
@@ -179,5 +178,4 @@ Returns all branch and ATM locations.
 | `type` | Description |
 |---|---|
 | `branch` | Full-service branch |
-| `atm` | ATM only |
 | `head` | Head Office |

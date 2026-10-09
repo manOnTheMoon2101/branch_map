@@ -14,8 +14,8 @@
   import capitecLogo from "../assets/capitec.png";
   import CircleAlert from "@lucide/svelte/icons/circle-alert";
   import ChevronDown from "@lucide/svelte/icons/chevron-down";
-  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Building2 from "@lucide/svelte/icons/building-2";
+  import Navigation from "@lucide/svelte/icons/navigation";
   import type { Map as MaplibreMap } from "maplibre-gl";
   import { Button } from "#lib/components/ui/button/index.js";
 
@@ -54,6 +54,66 @@
       duration: 1500,
       essential: true,
     });
+  }
+
+
+  let locating = $state<boolean>(false);
+  let locationError = $state<string | null>(null);
+
+  function haversineKm(
+    lat1: number,
+    lon1: number,
+    lat2: number,
+    lon2: number,
+  ): number {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  function findNearMe() {
+    if (!navigator.geolocation) {
+      locationError = "Geolocation not supported by your browser.";
+      return;
+    }
+    locating = true;
+    locationError = null;
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const nearest = branches.reduce<Branch | null>((best, b) => {
+          const d = haversineKm(
+            coords.latitude,
+            coords.longitude,
+            b.latitude,
+            b.longitude,
+          );
+          const bestD = best
+            ? haversineKm(
+                coords.latitude,
+                coords.longitude,
+                best.latitude,
+                best.longitude,
+              )
+            : Infinity;
+          return d < bestD ? b : best;
+        }, null);
+        locating = false;
+        if (nearest) flyToBranch(nearest);
+      },
+      (err) => {
+        locating = false;
+        locationError =
+          err.code === err.PERMISSION_DENIED
+            ? "Location access denied."
+            : "Could not get your location.";
+      },
+      { timeout: 10000 },
+    );
   }
 
   $effect(() => {
@@ -244,6 +304,26 @@
 
       {#if cardOpen}
         <div class="border-t">
+          <div class="px-4 py-3 border-b">
+            <Button
+              type="button"
+              onclick={findNearMe}
+              disabled={locating}
+              class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-sky-700 disabled:opacity-60"
+            >
+              {#if locating}
+                
+                Locating...
+              {:else}
+                <Navigation class="h-3.5 w-3.5" />
+                Find Nearest Branch
+              {/if}
+            </Button>
+            {#if locationError}
+              <p class="mt-1.5 text-xs text-destructive">{locationError}</p>
+            {/if}
+          </div>
+
           <ul class="divide-y divide-border">
             {#each visibleBranches as branch (branch.id)}
               <li>

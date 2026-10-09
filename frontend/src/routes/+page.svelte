@@ -324,7 +324,7 @@
             {/if}
           </div>
 
-          <ul class="divide-y divide-border">
+          <ul class="divide-y divide-border max-h-72 overflow-y-auto">
             {#each visibleBranches as branch (branch.id)}
               <li>
                 <Button
